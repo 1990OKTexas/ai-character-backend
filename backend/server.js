@@ -4,7 +4,10 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'https://your-frontend-name.onrender.com',
+  credentials: true
+}));
 app.use(express.json());
 
 app.use('/api/users', require('./routes/users'));
