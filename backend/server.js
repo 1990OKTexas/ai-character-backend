@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors({
-  origin: 'https://your-frontend-name.onrender.com',
+  origin: 'https://ai-character-website.onrender.com/',
   credentials: true
 }));
 app.use(express.json());
