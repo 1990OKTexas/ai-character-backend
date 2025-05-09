@@ -1,6 +1,11 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-// TODO: Add users routes
+// Example route
+router.get('/', (req, res) => {
+  res.send('Users route working!');
+});
 
-module.exports = router;
+// Add your user-related routes here
+
+export default router;
