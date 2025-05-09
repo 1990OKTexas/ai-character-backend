@@ -1,10 +1,10 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import User from '../models/User.js'; 
-// your Mongoose model
+import User from '../models/User.js';
 
 const router = express.Router();
 
+// Signup + login
 router.post('/signup', async (req, res) => {
   try {
     const { username, password, nickname, profilePicture } = req.body;
@@ -17,15 +17,43 @@ router.post('/signup', async (req, res) => {
     const newUser = new User({
       username,
       password: hashedPassword,
-      nickname
+      nickname,
+      profilePicture
     });
 
     await newUser.save();
-    res.status(201).json({ message: 'User created' });
 
+    // Save to session
+    req.session.user = {
+      id: newUser._id,
+      username: newUser.username,
+      nickname: newUser.nickname,
+      profilePicture: newUser.profilePicture
+    };
+
+    res.status(201).json({ message: 'Signup and login successful' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+// Get current logged-in user
+router.get('/me', (req, res) => {
+  if (req.session.user) {
+    res.json(req.session.user);
+  } else {
+    res.status(401).json({ message: 'Not logged in' });
+  }
+});
+
+// Logout
+router.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) return res.status(500).json({ message: 'Logout failed' });
+    res.clearCookie('connect.sid');
+    res.json({ message: 'Logged out' });
+  });
 });
 
 export default router;
