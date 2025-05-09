@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3000;
 
 // CORS setup for session cookies
 app.use(cors({
-  origin: 'https://your-frontend-url.onrender.com', // replace with your frontend URL
+  origin: 'https://ai-character-website.onrender.com',  // match EXACT frontend domain
   credentials: true
 }));
 
