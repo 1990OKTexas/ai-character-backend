@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
+
 import userRoutes from './routes/users.js';
 import characterRoutes from './routes/characters.js';
 import chatRoutes from './routes/chat.js';
@@ -12,21 +14,25 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Allow CORS with credentials (for session cookies)
+// CORS setup for session cookies
 app.use(cors({
-  origin: 'https://your-frontend-url.onrender.com', // replace with your actual frontend URL
+  origin: 'https://your-frontend-url.onrender.com', // replace with your frontend URL
   credentials: true
 }));
 
 app.use(express.json());
 
-// Setup session
+// Persistent session store in MongoDB
 app.use(session({
-  secret: 'your-secret-key', // change this to a secure, random string
+  secret: 'your-secret-key', // use something strong and random in production
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    collectionName: 'sessions'
+  }),
   cookie: {
-    secure: false, // set to true if using HTTPS
+    secure: false, // change to true if using HTTPS
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24 // 1 day
   }
