@@ -11,7 +11,13 @@ import chatRoutes from './routes/chat.js';
 dotenv.config();
 
 const app = express();
-app.use(cors({ origin: true, credentials: true }));
+const PORT = process.env.PORT || 3000;
+
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.use('/api/users', userRoutes);
@@ -24,8 +30,8 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => {
   console.log('MongoDB connected');
-  app.listen(process.env.PORT || 3000, () => {
-    console.log('Server is running');
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
   });
 })
-.catch(err => console.error(err));
+.catch(err => console.error('MongoDB connection error:', err));
