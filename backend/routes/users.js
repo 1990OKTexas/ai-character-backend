@@ -4,7 +4,7 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-// Signup
+// Signup route
 router.post('/signup', async (req, res) => {
   try {
     const { username, password, nickname, profilePicture } = req.body;
@@ -29,6 +29,7 @@ router.post('/signup', async (req, res) => {
 
     await newUser.save();
 
+    // Save user to session
     req.session.user = {
       id: newUser._id,
       username: newUser.username,
@@ -36,24 +37,53 @@ router.post('/signup', async (req, res) => {
       profilePicture: newUser.profilePicture
     };
 
-    return res.status(201).json({ message: 'Signup and login successful' });
-
+    res.status(201).json({ message: 'Signup and login successful' });
   } catch (err) {
     console.error('Signup error:', err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 
-// Get current logged-in user
+// Login route
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(400).json({ message: 'Incorrect username or password.' });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(400).json({ message: 'Incorrect username or password.' });
+    }
+
+    // Save user to session
+    req.session.user = {
+      id: user._id,
+      username: user.username,
+      nickname: user.nickname,
+      profilePicture: user.profilePicture
+    };
+
+    res.json({ message: 'Login successful' });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Current user route
 router.get('/me', (req, res) => {
   if (req.session.user) {
-    return res.json(req.session.user);
+    res.json(req.session.user);
   } else {
-    return res.status(401).json({ message: 'Not logged in' });
+    res.status(401).json({ message: 'Not logged in' });
   }
 });
 
-// Logout
+// Logout route
 router.post('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
@@ -61,7 +91,7 @@ router.post('/logout', (req, res) => {
       return res.status(500).json({ message: 'Logout failed' });
     }
     res.clearCookie('connect.sid');
-    return res.json({ message: 'Logged out' });
+    res.json({ message: 'Logged out' });
   });
 });
 
