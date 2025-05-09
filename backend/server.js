@@ -43,6 +43,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/characters', characterRoutes);
 app.use('/api/chat', chatRoutes);
 
+// Handle unknown routes with JSON
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
