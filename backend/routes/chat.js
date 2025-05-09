@@ -1,6 +1,3 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-
-// TODO: Add chat routes
-
-module.exports = router;
+export default router;
